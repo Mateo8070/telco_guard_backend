@@ -60,7 +60,7 @@ router.get('/', async (req, res) => {
         name:       site.name,
         location:   site.location,
         status:     site.status,
-        lastUpdate: Date.now(),
+        lastUpdate: rows.length > 0 ? rows[0].timestamp : new Date(site.created_at).getTime(),
         sensors,
       };
     }));

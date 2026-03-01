@@ -1,0 +1,20 @@
+{
+    "name": "telco-guard-backend",
+    "version": "1.0.0",
+    "description": "TelcoGuard REST API — receives sensor data and serves the dashboard",
+    "type": "module",
+    "main": "src/index.js",
+    "scripts": {
+        "start": "node src/index.js",
+        "dev": "node --watch src/index.js"
+    },
+    "dependencies": {
+        "@supabase/supabase-js": "^2.98.0",
+        "cors": "^2.8.5",
+        "dotenv": "^17.2.3",
+        "express": "^4.21.2"
+    },
+    "engines": {
+        "node": ">=18"
+    }
+}

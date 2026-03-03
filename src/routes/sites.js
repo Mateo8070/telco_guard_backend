@@ -7,9 +7,9 @@ const router = express.Router();
 const HISTORY_LIMIT = 100;
 
 const SENSOR_DEFAULTS = {
-  temperature: { threshold: 45, unit: '°C' },
-  humidity:    { threshold: 80, unit: '%'  },
-  smoke:       { threshold: 50, unit: 'ppm'},
+  temperature: { threshold: 29.5, unit: '°C' },
+  humidity:    { threshold: 70.0, unit: '%'  },
+  smoke:       { threshold: 10.0, unit: 'ppm'},
 };
 
 /**

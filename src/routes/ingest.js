@@ -24,23 +24,23 @@ function requireApiKey(req, res, next) {
   next();
 }
 
-/**
- * POST /api/ingest
- * Accepts sensor readings from the Raspberry Pi.
- *
- * Expected body:
- * {
- *   "siteId": "site-001",
- *   "sensors": {
- *     "temperature": 27.4,   // °C
- *     "humidity": 55.2,      // %
- *     "smoke": 18.0          // ppm
- *   }
- * }
- *
- * Headers:
- *   X-API-Key: <your secret key>
- */
+  /**
+   * POST /api/ingest
+   * Accepts sensor readings from the Raspberry Pi.
+   *
+   * Expected body:
+   * {
+   *   "siteId": "site-001",
+   *   "sensors": {
+   *     "temperature": 27.4,   // °C
+   *     "humidity": 55.2,      // %
+   *     "smoke": 1             // 0=Clear, 1=Detected
+   *   }
+   * }
+   *
+   * Headers:
+   *   X-API-Key: <your secret key>
+   */
 router.post('/', requireApiKey, async (req, res) => {
   const { siteId, sensors } = req.body;
 
@@ -83,8 +83,9 @@ router.post('/', requireApiKey, async (req, res) => {
     const smoke = sensors.smoke ?? sensors.gas ?? 0;
 
     let status = 'online';
-    if (temp > 45 || smoke > 50)    status = 'critical';
-    else if (temp > 38 || humid > 60) status = 'warning';
+    // Binary smoke sensor: 1 = critical alert
+    if (temp > 45 || smoke > 0.5)    status = 'critical';
+    else if (temp > 38 || humid > 70) status = 'warning';
 
     // Update site status
     const { error: updateError } = await db

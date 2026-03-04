@@ -1,5 +1,6 @@
 import express from 'express';
 import db from '../db.js';
+import { sendPushNotification } from '../services/notificationService.js';
 
 const router = express.Router();
 
@@ -87,13 +88,23 @@ router.post('/', requireApiKey, async (req, res) => {
     if (temp > 45 || smoke > 0.5)    status = 'critical';
     else if (temp > 38 || humid > 70) status = 'warning';
 
-    // Update site status
-    const { error: updateError } = await db
+    // Update site status and fetch name for notification
+    const { data: siteData, error: updateError } = await db
       .from('telco_sites')
       .update({ status })
-      .eq('id', siteId);
+      .eq('id', siteId)
+      .select('name')
+      .single();
 
     if (updateError) throw updateError;
+
+    // Trigger push notification for abnormal statuses
+    if (status === 'critical' || status === 'warning') {
+      const siteName = siteData?.name || siteId;
+      sendPushNotification(siteName, status, sensors).catch(err => {
+        console.error('[NOTIFICATION] Failed to send push notification:', err.message);
+      });
+    }
 
     console.log(`[INGEST] site=${siteId} temp=${sensors.temperature} humid=${sensors.humidity} smoke=${sensors.smoke ?? sensors.gas}`);
     res.status(200).json({ success: true, timestamp });

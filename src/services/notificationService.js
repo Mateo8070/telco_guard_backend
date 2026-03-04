@@ -41,7 +41,8 @@ export async function sendPushNotification(siteName, level, sensors) {
     if (!isFirebaseInitialized) return;
 
     const title = level === 'critical' ? '🚨 CRITICAL ALERT' : '⚠️ WARNING';
-    const body = `Site ${siteName} has reached ${level} levels. Temp: ${sensors.temperature}°C, Smoke: ${sensors.smoke}`;
+    const smokeAlert = sensors.smoke > 0 ? 'SMOKE DETECTED! ' : '';
+    const body = `${siteName}: ${smokeAlert}Temp: ${sensors.temperature}°C, Humid: ${sensors.humidity}%`;
 
     const message = {
         notification: {

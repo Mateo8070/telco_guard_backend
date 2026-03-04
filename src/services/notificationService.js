@@ -6,17 +6,26 @@ dotenv.config();
 let isFirebaseInitialized = false;
 
 try {
-    // Check if configuration exists
+    // 1. Check for raw JSON string in ENV (Vercel-friendly)
+    const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT;
+    // 2. Check for file path in ENV (Legacy/Local)
     const serviceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT_PATH;
     
-    if (serviceAccountPath) {
+    if (serviceAccountJson) {
+        const credentials = JSON.parse(serviceAccountJson);
+        admin.initializeApp({
+            credential: admin.credential.cert(credentials)
+        });
+        isFirebaseInitialized = true;
+        console.log('[NOTIFICATION] Firebase Admin initialized via ENV string.');
+    } else if (serviceAccountPath) {
         admin.initializeApp({
             credential: admin.credential.cert(serviceAccountPath)
         });
         isFirebaseInitialized = true;
-        console.log('[NOTIFICATION] Firebase Admin initialized successfully.');
+        console.log('[NOTIFICATION] Firebase Admin initialized via file path.');
     } else {
-        console.warn('[NOTIFICATION] FIREBASE_SERVICE_ACCOUNT_PATH not found in .env. Push notifications will be disabled.');
+        console.warn('[NOTIFICATION] No Firebase credentials found in ENV. Push notifications disabled.');
     }
 } catch (error) {
     console.error('[NOTIFICATION] Error initializing Firebase:', error.message);

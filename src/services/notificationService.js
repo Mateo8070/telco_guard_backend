@@ -49,10 +49,25 @@ export async function sendPushNotification(siteName, level, sensors) {
             title: title,
             body: body,
         },
+        android: {
+            priority: 'high',
+            notification: {
+                channelId: 'high_importance_channel',
+                clickAction: 'FLUTTER_NOTIFICATION_CLICK',
+            },
+        },
+        apns: {
+            payload: {
+                aps: {
+                    contentAvailable: true,
+                    sound: 'default',
+                    badge: 1,
+                },
+            },
+        },
         data: {
             siteName: siteName,
             level: level,
-            click_action: 'FLUTTER_NOTIFICATION_CLICK'
         },
         topic: 'alerts',
     };
